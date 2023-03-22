@@ -23,9 +23,9 @@ def _find_location_id() -> Tuple[str, str]:
 class LocationID:
 
     @staticmethod
-    def request_location():
+    def set_city():
         return _request_location
 
     @staticmethod
-    def find_location_id():
+    def get_id():
         return _find_location_id

@@ -1,24 +1,25 @@
-from API_request import ApiInterface
+from python_basic_diploma.utils.surch.API_request import ApiInterface
 import json
 from typing import Tuple, List
 
 
-def _hotels_propertys() -> None:
+def _hotels_propertys(region_id: str, adults: int = 1, min_price: int = 1, max_price: int = 1000) -> None:
+
     payload = {
         "currency": "USD",
         "eapid": 1,
         "locale": "en_US",
         "siteId": 300000001,
-        "destination": {"regionId": "553248635975177316"},
+        "destination": {"regionId": region_id},
         "checkInDate": {
-            "day": 25,
-            "month": 3,
-            "year": 2023
+            "day": 10,
+            "month": 10,
+            "year": 2022
         },
         "checkOutDate": {
-            "day": 26,
-            "month": 3,
-            "year": 2023
+            "day": 15,
+            "month": 10,
+            "year": 2022
         },
         "rooms": [
             {
@@ -30,8 +31,8 @@ def _hotels_propertys() -> None:
         "resultsSize": 200,
         "sort": "PRICE_LOW_TO_HIGH",
         "filters": {"price": {
-            "max": 500,
-            "min": 1
+            "max": max_price,
+            "min": min_price
         }}
     }
     request = ApiInterface.super_request()
@@ -44,10 +45,8 @@ def _hotels_list() -> List[Tuple[str, str, str]]:
     with open("V2_LIST.json", "r", encoding='UTF-8') as file_v2:
         responce = json.load(file_v2)
 
-        filtered_properties = [
-            (item.get('id'), item.get('name'), item['price']['strikeOut']['formatted'])
-            for item in responce['data']['propertySearch']['properties']
-        ]
+        filtered_properties = [(item.get('id'), item.get('name'), str(int(item['price']['lead']['amount']))) for item in
+                               responce['data']['propertySearch']['properties']]
         for string in filtered_properties:
             print(string)
 
@@ -57,9 +56,9 @@ def _hotels_list() -> List[Tuple[str, str, str]]:
 class HotelsID:
 
     @staticmethod
-    def hotels_propertys():
+    def set_propertys():
         return _hotels_propertys
 
     @staticmethod
-    def hotels_list():
+    def get_hotels_list():
         return _hotels_list
