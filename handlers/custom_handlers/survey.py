@@ -44,20 +44,21 @@ def get_city(message: Message) -> None:
     with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
         data['city'] = message.text
 
-@bot.message_handler(content_type=['text', 'contact'], state=[UserInfoState.number])
+@bot.message_handler(content_types=['text', 'contact'], state=[UserInfoState.number])
 def get_contact(message: Message) -> None:
     if message.content_type == 'contact':
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-            data['phone_number'] = message.text
+            data['phone_number'] = message.contact.phone_number
             text = f'Спасибо за предоставленную информацию, ваши данные \n' \
                    f'Имя {data["name"]}\n' \
                    f'Возраст {data["age"]}\n' \
                    f'Страна {data["country"]}\n' \
                    f'Город {data["city"]}\n' \
                    f'Номер телефона {data["phone_number"]}'
-            bot.send_message(message.from_user.id, text)
+            bot.send_message(message.from_user.id, text, parse_mode="html")
     else:
         bot.send_message(message.from_user.id, 'Чтобы отправить информацию нажми на кнопку')
+    bot.delete_state(message.from_user.id, message.chat.id)
 
 
 

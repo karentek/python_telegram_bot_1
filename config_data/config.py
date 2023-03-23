@@ -12,6 +12,8 @@ DEFAULT_COMMANDS = (
     ("start", "Запустить бота"),
     ("help", "Вывести справку"),
     ("hello_world", "Привет мир"),
-    ("survey", 'Опрос')
+    ("survey", 'Опрос'),
+    ("choose_a_hotel", 'Выбрать отель')
+
 
 )
