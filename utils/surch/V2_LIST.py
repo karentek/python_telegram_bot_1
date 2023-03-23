@@ -23,8 +23,8 @@ def _hotels_propertys(region_id: str, adults: int = 1, min_price: int = 1, max_p
         },
         "rooms": [
             {
-                "adults": 2,
-                "children": [{"age": 5}, {"age": 7}]
+                "adults": 2, None: None
+                # "children": [{"age": 5}, {"age": 7}]
             }
         ],
         "resultsStartingIndex": 0,
