@@ -55,46 +55,30 @@ def get_adults(message: Message) -> None:
     else:
         bot.send_message(message.from_user.id, 'Колличество может быть только числом')
 
-# "children": [{"age": 5}, {"age": 7}]
-
-
 @bot.message_handler(state=[HotelInfoState.childrens])
 def get_childrens(message: Message) -> None:
-    if message.text.isdigit():
-        bot.send_message(message.from_user.id, 'Спасибо записал')
-        with bot.retrieve_data(message.from_user.id, message.chat.id) as hotel_data:
-            hotel_data['childrens'] = int(message.text)
-
-        if int(message.text) > 0:
-            bot.send_message(message.from_user.id, 'Введите возраст ребенка')
-            bot.set_state(message.from_user.id, HotelInfoState.childrens_age, message.chat.id)
-        elif int(message.text) == 0:
-            bot.send_message(message.from_user.id, f'Спасибо за предоставленную информацию, ваши данные\n')
-            for key, value in hotel_data.items():
-                bot.send_message(message.from_user.id, f'{key}---{value}\n')
-            bot.delete_state(message.from_user.id, message.chat.id)
-
+    children_count = int(message.text)
+    if children_count > 0:
+        bot.send_message(message.chat.id, f'Введите возраст каждого ребенка:')
+        bot.register_next_step_handler(message, get_children_age_list, [], children_count)
     else:
-        bot.send_message(message.from_user.id, 'Колличество может быть только числом')
-
-
-age_list = []
-@bot.message_handler(state=[HotelInfoState.childrens])
-def get_childrens_age(message: Message) -> None:
-    if message.text.isdigit():
-        get_childrens_age.count = (int(message.text))
-        bot.send_message(message.from_user.id, 'Спасибо записал')
-        if get_childrens_age.count > 0:
-            get_childrens_age.count -= 1
-            bot.send_message(message.from_user.id, 'Введите возраст ребенка')
-            bot.set_state(message.from_user.id, HotelInfoState.childrens_age, message.chat.id)
-            age_list.append({"age": int(message.text)})
-            with bot.retrieve_data(message.from_user.id, message.chat.id) as hotel_data:
-                hotel_data["children"] = age_list
-        else:
+        bot.send_message(message.from_user.id, f'Спасибо за предоставленную информацию, ваши данные\n')
+        with bot.retrieve_data(message.from_user.id, message.chat.id) as hotel_data:
             for key, value in hotel_data.items():
                 bot.send_message(message.from_user.id, f'{key}---{value}\n')
-
-
-        bot.send_message(message.from_user.id, f'Спасибо за предоставленную информацию, ваши данные\n')
         bot.delete_state(message.from_user.id, message.chat.id)
+
+
+def get_children_age_list(message, children_age_list, children_count):
+    children_age_list.append({"age": int(message.text)})
+    if len(children_age_list) == children_count:
+        with bot.retrieve_data(message.from_user.id, message.chat.id) as hotel_data:
+            hotel_data['childrens'] = children_age_list
+        bot.send_message(message.from_user.id, f'Спасибо за предоставленную информацию, ваши данные:\n')
+        for key, value in hotel_data.items():
+            bot.send_message(message.from_user.id, f'{key}---{value}\n')
+        bot.delete_state(message.from_user.id, message.chat.id)
+    else:
+        bot.send_message(message.chat.id, f'Введите возраст {len(children_age_list)+1}-го ребенка:')
+        bot.register_next_step_handler(message, get_children_age_list, children_age_list, children_count)
+
