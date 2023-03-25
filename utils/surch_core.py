@@ -1,5 +1,5 @@
-from surch.V3_SEARCH import LocationID
-from surch.V2_LIST import HotelsID
+from surch.hotels_by_city import LocationID
+from surch.hotels_list import HotelsID
 
 
 create_json_with_location_id = LocationID.set_city()

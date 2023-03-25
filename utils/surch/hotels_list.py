@@ -1,9 +1,9 @@
 from python_basic_diploma.utils.surch.API_request import ApiInterface
 import json
-from typing import Tuple, List
+from typing import Tuple, List, Dict
 
 
-def _hotels_propertys(region_id: str, adults: int = 1, min_price: int = 1, max_price: int = 1000) -> None:
+def _hotels_propertys(region_id: str, guests: List[Dict], min_price: int = 1, max_price: int = 1000) -> None:
 
     payload = {
         "currency": "USD",
@@ -21,12 +21,7 @@ def _hotels_propertys(region_id: str, adults: int = 1, min_price: int = 1, max_p
             "month": 10,
             "year": 2022
         },
-        "rooms": [
-            {
-                # "adults": 2, None: None
-                # "children": [{"age": 5}, {"age": 7}]
-            }
-        ],
+        "rooms": guests,
         "resultsStartingIndex": 0,
         "resultsSize": 200,
         "sort": "PRICE_LOW_TO_HIGH",
@@ -37,12 +32,12 @@ def _hotels_propertys(region_id: str, adults: int = 1, min_price: int = 1, max_p
     }
     request = ApiInterface.super_request()
     responce = request('/properties/v2/list', 'POST', payload)
-    with open("V2_LIST.json", "w") as file:
+    with open("hotels_list.json", "w") as file:
         json.dump(responce, file, indent=4)
 
 
 def _hotels_list() -> List[Tuple[str, str, str]]:
-    with open("V2_LIST.json", "r", encoding='UTF-8') as file_v2:
+    with open("hotels_list.json", "r", encoding='UTF-8') as file_v2:
         responce = json.load(file_v2)
 
         filtered_properties = [(item.get('id'), item.get('name'), str(int(item['price']['lead']['amount']))) for item in

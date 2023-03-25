@@ -1,0 +1,297 @@
+{
+    "q": "\u041d\u044c\u044e \u0439\u043e\u0440\u043a",
+    "rid": "07f6034b777d410983982d0e10b50e01",
+    "rc": "OK",
+    "sr": [
+        {
+            "@type": "gaiaRegionResult",
+            "index": "0",
+            "gaiaId": "2621",
+            "type": "CITY",
+            "regionNames": {
+                "fullName": "New York, New York, United States of America",
+                "shortName": "New York",
+                "displayName": "New York, New York, United States",
+                "primaryDisplayName": "New York",
+                "secondaryDisplayName": "New York, United States",
+                "lastSearchName": "New York"
+            },
+            "essId": {
+                "sourceName": "GAI",
+                "sourceId": "2621"
+            },
+            "coordinates": {
+                "lat": "40.712843",
+                "long": "-74.005966"
+            },
+            "hierarchyInfo": {
+                "country": {
+                    "name": "United States",
+                    "isoCode2": "US",
+                    "isoCode3": "USA"
+                }
+            }
+        },
+        {
+            "@type": "gaiaRegionResult",
+            "index": "1",
+            "gaiaId": "6203489",
+            "type": "NEIGHBORHOOD",
+            "regionNames": {
+                "fullName": "Midtown, New York, New York, United States of America",
+                "shortName": "Midtown",
+                "displayName": "Midtown, New York, New York, United States",
+                "primaryDisplayName": "Midtown",
+                "secondaryDisplayName": "New York, New York, United States",
+                "lastSearchName": "Midtown"
+            },
+            "essId": {
+                "sourceName": "GAI",
+                "sourceId": "6203489"
+            },
+            "coordinates": {
+                "lat": "40.755117",
+                "long": "-73.98478"
+            },
+            "hierarchyInfo": {
+                "country": {
+                    "name": "United States",
+                    "isoCode2": "US",
+                    "isoCode3": "USA"
+                }
+            }
+        },
+        {
+            "@type": "gaiaRegionResult",
+            "index": "2",
+            "gaiaId": "149004",
+            "type": "NEIGHBORHOOD",
+            "regionNames": {
+                "fullName": "Queens, New York, United States of America",
+                "shortName": "Queens",
+                "displayName": "Queens, New York, United States",
+                "primaryDisplayName": "Queens",
+                "secondaryDisplayName": "New York, United States",
+                "lastSearchName": "Queens"
+            },
+            "essId": {
+                "sourceName": "GAI",
+                "sourceId": "149004"
+            },
+            "coordinates": {
+                "lat": "40.71025273032951",
+                "long": "-73.81875841072811"
+            },
+            "hierarchyInfo": {
+                "country": {
+                    "name": "United States",
+                    "isoCode2": "US",
+                    "isoCode3": "USA"
+                }
+            }
+        },
+        {
+            "@type": "gaiaRegionResult",
+            "index": "3",
+            "gaiaId": "717",
+            "type": "CITY",
+            "regionNames": {
+                "fullName": "Buffalo, New York, United States of America",
+                "shortName": "Buffalo",
+                "displayName": "Buffalo, New York, United States",
+                "primaryDisplayName": "Buffalo",
+                "secondaryDisplayName": "New York, United States",
+                "lastSearchName": "Buffalo"
+            },
+            "essId": {
+                "sourceName": "GAI",
+                "sourceId": "717"
+            },
+            "coordinates": {
+                "lat": "42.886448",
+                "long": "-78.878372"
+            },
+            "hierarchyInfo": {
+                "country": {
+                    "name": "United States",
+                    "isoCode2": "US",
+                    "isoCode3": "USA"
+                }
+            }
+        },
+        {
+            "@type": "gaiaRegionResult",
+            "index": "4",
+            "gaiaId": "177851",
+            "type": "CITY",
+            "regionNames": {
+                "fullName": "Brooklyn, New York, United States of America",
+                "shortName": "Brooklyn",
+                "displayName": "Brooklyn, New York, United States",
+                "primaryDisplayName": "Brooklyn",
+                "secondaryDisplayName": "New York, United States",
+                "lastSearchName": "Brooklyn"
+            },
+            "essId": {
+                "sourceName": "GAI",
+                "sourceId": "177851"
+            },
+            "coordinates": {
+                "lat": "40.678177",
+                "long": "-73.94416"
+            },
+            "hierarchyInfo": {
+                "country": {
+                    "name": "United States",
+                    "isoCode2": "US",
+                    "isoCode3": "USA"
+                }
+            }
+        },
+        {
+            "@type": "gaiaRegionResult",
+            "index": "5",
+            "gaiaId": "603260",
+            "type": "CITY",
+            "regionNames": {
+                "fullName": "Albany, New York, United States of America",
+                "shortName": "Albany",
+                "displayName": "Albany, New York, United States",
+                "primaryDisplayName": "Albany",
+                "secondaryDisplayName": "New York, United States",
+                "lastSearchName": "Albany"
+            },
+            "essId": {
+                "sourceName": "GAI",
+                "sourceId": "603260"
+            },
+            "coordinates": {
+                "lat": "42.650249",
+                "long": "-73.753578"
+            },
+            "hierarchyInfo": {
+                "country": {
+                    "name": "United States",
+                    "isoCode2": "US",
+                    "isoCode3": "USA"
+                }
+            }
+        },
+        {
+            "@type": "gaiaRegionResult",
+            "index": "6",
+            "gaiaId": "601764",
+            "type": "CITY",
+            "regionNames": {
+                "fullName": "Syracuse, New York, United States of America",
+                "shortName": "Syracuse",
+                "displayName": "Syracuse, New York, United States",
+                "primaryDisplayName": "Syracuse",
+                "secondaryDisplayName": "New York, United States",
+                "lastSearchName": "Syracuse"
+            },
+            "essId": {
+                "sourceName": "GAI",
+                "sourceId": "601764"
+            },
+            "coordinates": {
+                "lat": "43.048122",
+                "long": "-76.147423"
+            },
+            "hierarchyInfo": {
+                "country": {
+                    "name": "United States",
+                    "isoCode2": "US",
+                    "isoCode3": "USA"
+                }
+            }
+        },
+        {
+            "@type": "gaiaRegionResult",
+            "index": "7",
+            "gaiaId": "602721",
+            "type": "CITY",
+            "regionNames": {
+                "fullName": "Niagara Falls, New York, United States of America",
+                "shortName": "Niagara Falls",
+                "displayName": "Niagara Falls, New York, United States",
+                "primaryDisplayName": "Niagara Falls",
+                "secondaryDisplayName": "New York, United States",
+                "lastSearchName": "Niagara Falls"
+            },
+            "essId": {
+                "sourceName": "GAI",
+                "sourceId": "602721"
+            },
+            "coordinates": {
+                "lat": "43.08478",
+                "long": "-79.06168"
+            },
+            "hierarchyInfo": {
+                "country": {
+                    "name": "United States",
+                    "isoCode2": "US",
+                    "isoCode3": "USA"
+                }
+            }
+        },
+        {
+            "@type": "gaiaRegionResult",
+            "index": "8",
+            "gaiaId": "6055969",
+            "type": "CITY",
+            "regionNames": {
+                "fullName": "Lake George, New York, United States of America",
+                "shortName": "Lake George",
+                "displayName": "Lake George, New York, United States",
+                "primaryDisplayName": "Lake George",
+                "secondaryDisplayName": "New York, United States",
+                "lastSearchName": "Lake George"
+            },
+            "essId": {
+                "sourceName": "GAI",
+                "sourceId": "6055969"
+            },
+            "coordinates": {
+                "lat": "43.425996",
+                "long": "-73.712425"
+            },
+            "hierarchyInfo": {
+                "country": {
+                    "name": "United States",
+                    "isoCode2": "US",
+                    "isoCode3": "USA"
+                }
+            }
+        },
+        {
+            "@type": "gaiaRegionResult",
+            "index": "9",
+            "gaiaId": "6142503",
+            "type": "NEIGHBORHOOD",
+            "regionNames": {
+                "fullName": "SoHo, New York, New York, United States of America",
+                "shortName": "SoHo",
+                "displayName": "SoHo, New York, New York, United States",
+                "primaryDisplayName": "SoHo",
+                "secondaryDisplayName": "New York, New York, United States",
+                "lastSearchName": "SoHo"
+            },
+            "essId": {
+                "sourceName": "GAI",
+                "sourceId": "6142503"
+            },
+            "coordinates": {
+                "lat": "40.723301",
+                "long": "-74.002991"
+            },
+            "hierarchyInfo": {
+                "country": {
+                    "name": "United States",
+                    "isoCode2": "US",
+                    "isoCode3": "USA"
+                }
+            }
+        }
+    ]
+}
