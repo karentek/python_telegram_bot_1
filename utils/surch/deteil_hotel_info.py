@@ -1,11 +1,11 @@
-from API_request import ApiInterface
+from python_basic_diploma.utils.surch.API_request import ApiInterface
 import json
-
-def _deteil(id: str) -> None:
+from typing import Tuple, List, Dict
+def _deteil(id: str) -> Tuple[str, str, List[Tuple[str, str]]]:
     payload = {
         "currency": "USD",
         "eapid": 1,
-        "locale": "en_US",
+        "locale": "ru_RU",
         "siteId": 300000001,
         "propertyId": id
     }
@@ -17,8 +17,20 @@ def _deteil(id: str) -> None:
         json.dump(responce, file, indent=4)
 
     with open("deteil_hotel_info.json", "r") as file_v2D:
-        json.load(file_v2D)
+        response = json.load(file_v2D)
+        adress = response['data']['propertyInfo']['summary']['location']['address']['addressLine']
+        view_in_map_link = response['data']['propertyInfo']['summary']['location']['staticImage']['url']
+        photos_list = response['data']['propertyInfo']['propertyGallery']['images']
+        photos = [(photos_list[index]['image']['description'], photos_list[index]['image']['url']) for index in range(len(photos_list))]
 
-#TODO Добавить фильтр для вывода инфо о найденном отеле
+    return adress, view_in_map_link, photos
 
+class DeteilHotel:
+
+    @staticmethod
+    def deteil_hotel():
+        return _deteil
+
+
+deteil_info = DeteilHotel.deteil_hotel()
 

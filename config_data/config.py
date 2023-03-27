@@ -13,7 +13,9 @@ DEFAULT_COMMANDS = (
     ("help", "Вывести справку"),
     ("hello_world", "Привет мир"),
     ("survey", 'Опрос'),
-    ("choose_a_hotel", 'Выбрать отель')
+    ("choose_a_hotel", 'Выбрать отель'),
+    ("history", 'Посмотреть историю запросов')
+
 
 
 )

@@ -132,3 +132,7 @@ dmypy.json
 /utils/V2_LIST.json
 /utils/hotels_by_city.json
 /utils/hotels_list.json
+/database.db
+/deteil_hotel_info.json
+/hotels_by_city.json
+/hotels_list.json

@@ -3,24 +3,16 @@ import json
 from typing import Tuple, List, Dict
 
 
-def _hotels_propertys(region_id: str, guests: List[Dict], min_price: int = 1, max_price: int = 1000) -> None:
+def _hotels_propertys(region_id: str, guests: List[Dict], date_in: Dict, date_out: Dict, min_price: int = 1, max_price: int = 1000) -> None:
 
     payload = {
         "currency": "USD",
         "eapid": 1,
-        "locale": "en_US",
+        "locale": "ru_RU",
         "siteId": 300000001,
         "destination": {"regionId": region_id},
-        "checkInDate": {
-            "day": 10,
-            "month": 10,
-            "year": 2022
-        },
-        "checkOutDate": {
-            "day": 15,
-            "month": 10,
-            "year": 2022
-        },
+        "checkInDate": date_in,
+        "checkOutDate": date_out,
         "rooms": guests,
         "resultsStartingIndex": 0,
         "resultsSize": 200,

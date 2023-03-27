@@ -9,5 +9,9 @@ class ModelBase(pw.Model):
         database = db
 
 class History(ModelBase):
-    user_message = pw.TextField()
-    bot_message = pw.TextField()
+    chat_id = pw.TextField()
+    user_name = pw.TextField()
+    user_request = pw.TextField()
+    bot_response = pw.TextField()
+
+
