@@ -5,6 +5,10 @@ from python_basic_diploma.keyboards.reply.contact import request_contact
 
 @bot.message_handler(commands=["survey"])
 def survey(message: Message) -> None:
+    """
+    Данный сценарий просто переписан из видео
+    """
+
     bot.set_state(message.from_user.id, UserInfoState.name, message.chat.id)
     bot.send_message(message.from_user.id, f'Привет, {message.from_user.username}, введи свое имя')
 

@@ -1,7 +1,5 @@
 import datetime
 
-
-
 class Date:
     """Класс для конвертации строки в дату
     attributes:
@@ -47,19 +45,5 @@ class Date:
 
         date_obj = cls(day, month, year)
         return date_obj
-
-# date_1 = Date.from_string('40-12-2015')
-# print(date_1)
-# print(Date.is_date_valid('05.02.2023'))
-# print(Date.is_date_valid('20-12-2023'))
-# print(Date.is_date_valid('20-02-2022'))
-#
-# date = Date.from_string('05-02-2023')
-#
-# print(date)
-# print(Date.is_date_valid(date.day, date.month, date.year))
-# print(date.day)
-# print(date.month)
-# print(date.year)
 
 

@@ -10,6 +10,12 @@ from python_basic_diploma.utils.surch.deteil_hotel_info import deteil_info
 
 
 class UserRequest:
+
+    """
+    Класс UserRequest: В атрибутах класса хранятся данные введенные пользователем
+                        для доступа к ним из любого блока сценария выбора отеля
+    """
+
     def __init__(self, chat_id: int, user_name: str) -> None:
         self.user_name = user_name
         self.chat_id = chat_id
@@ -32,11 +38,36 @@ db_write = crud.create()
 @bot.message_handler(commands=["choose_a_hotel"])
 def choose_hotel(message: Message) -> None:
 
+    """
+    Бот ожидает запуска сценария с сообщения с командой choose_a_hotel
+    в данном блоке пользователю необходимо ввести название страны для последующуй обработки в
+    следующем шаге сценария
+
+    :param message: объект pyTelegramBotApi
+    :return: None
+    """
+
     bot.send_message(message.from_user.id, f'{message.from_user.username}, введи страну для поиска отеля')
     bot.register_next_step_handler(message, get_country_)
 
 
 def get_country_(message: Message) -> None:
+
+    """
+    :get_country_: функция, на вход подается сообщение от пользователя с наименованием страны
+                  проверяется правильность ввода, а именно:
+                  сообщение должно состоять только из букв.
+                  Если условие не выполняется, блок сценария повторяется.
+                  Далее для данного чата создается объект класса UserRequest,
+                  помещается в список для хранения,
+                  и записываются данные в атрибуты класса.
+                  После чего предлагается ввести новое сообщение и вызывается
+                  функция для выполнения следующего блока сценария
+
+    :param message: объект pyTelegramBotApi
+    :return: None
+    """
+
     if message.text.isalpha():
         instance = UserRequest(message.chat.id, message.from_user.username)
         instance.country = message.text
@@ -48,8 +79,23 @@ def get_country_(message: Message) -> None:
         bot.register_next_step_handler(message, choose_hotel)
 
 
-
 def get_city_(message: Message) -> None:
+    """
+    :get_country_: функция, на вход подается сообщение от пользователя с наименованием города.
+                  Проверяется правильность ввода, а именно:
+                  сообщение должно состоять только из букв.
+                  Если условие не выполняется, блок сценария повторяется.
+                  В случае успешной проверки
+                  производится попытка совершить API запрос, обработать полученный JSON,
+                  и извлечь ID искомого города, в случае неудачной попытки вызывается ошибка,
+                  после чего предлагается начать заново ввод данных.
+                  Данные записываются в атрибуты класса.
+                  Далее предлагается ввести новое сообщение и вызывается
+                  функция для выполнения следующего блока сценария
+
+    :param message:
+    :return:
+    """
     if message.text.isalpha():
         try:
             instance = dict_requests[message.chat.id]
@@ -65,7 +111,7 @@ def get_city_(message: Message) -> None:
             bot.register_next_step_handler(message, get_min_price)
         except Exception:
             bot.send_message(message.from_user.id, 'Произошла ошибка, видимо такой локации не существует\n'
-                                                   'попробуйте заново\n'
+                                                   'Попробуйте заново\n'
                                                    'Введите страну поиска')
             bot.register_next_step_handler(message, get_country_)
 
@@ -74,9 +120,21 @@ def get_city_(message: Message) -> None:
         bot.register_next_step_handler(message, get_city_)
 
 
-
-
 def get_min_price(message: Message) -> None:
+    """
+    :get_min_price: функция, на вход подается сообщение
+                  с минимальной приемлемой для пользователя стоимостью
+                  проверяется правильность ввода, а именно:
+                  сообщение должно состоять только из цифр.
+                  Если условие не выполняется, блок сценария повторяется.
+                  Данные записываются в атрибуты класса UserRequest.
+                  После чего предлагается ввести новое сообщение и вызывается
+                  функция для выполнения следующего блока сценария
+
+    :param message: объект pyTelegramBotApi
+    :return: None
+    """
+
     instance = dict_requests[message.chat.id]
     if message.text.isdigit():
         instance.min_price = int(message.text)
@@ -87,20 +145,47 @@ def get_min_price(message: Message) -> None:
         bot.register_next_step_handler(message, get_min_price)
 
 
-
 def get_max_price(message: Message) -> None:
+
+    """
+    :get_min_price: функция, на вход подается сообщение
+                  с максимальной приемлемой для пользователя стоимостью
+                  проверяется правильность ввода, а именно:
+                  сообщение должно состоять только из цифр.
+                  Если условие не выполняется, блок сценария повторяется.
+                  Данные записываются в атрибуты класса UserRequest.
+                  После чего предлагается ввести новое сообщение и вызывается
+                  функция для выполнения следующего блока сценария
+
+    :param message: объект pyTelegramBotApi
+    :return: None
+    """
+
     instance = dict_requests[message.chat.id]
     if message.text.isdigit():
         instance.max_price = int(message.text)
         bot.send_message(message.from_user.id, 'Спасибо записал. Теперь введи дату заселения\n'
-                                               'Правильный формат: dd.mm.yyyy\n'
-                                               )
+                                               'Правильный формат: dd.mm.yyyy\n')
         bot.register_next_step_handler(message, get_check_in_date)
     else:
         bot.send_message(message.from_user.id, 'Цена может быть только числом, попробуйте ввести еще раз')
         bot.register_next_step_handler(message, get_max_price)
 
 def get_check_in_date(message: Message) -> None:
+
+    """
+    :get_min_price: функция, на вход подается сообщение
+                  с датой заселения.
+                  Проверяется корректность ввода даты, с помощью методов класса Date
+                  Если дата была введена не корректно, блок сценария повторяется.
+                  Данные записываются в атрибуты класса UserRequest.
+                  После чего предлагается ввести новое сообщение и вызывается
+                  функция для выполнения следующего блока сценария
+
+    :param message: объект pyTelegramBotApi
+    :return: None
+    """
+
     try:
         date = Date.from_string(message.text)
         if Date.is_date_valid(date.day, date.month, date.year):
@@ -124,6 +209,20 @@ def get_check_in_date(message: Message) -> None:
 
 
 def get_check_out_date(message: Message) -> None:
+
+    """
+    :get_min_price: функция, на вход подается сообщение
+                  с датой выселения.
+                  Проверяется корректность ввода даты, с помощью методов класса Date
+                  Если дата была введена не корректно, блок сценария повторяется.
+                  Данные записываются в атрибуты класса UserRequest.
+                  После чего предлагается ввести новое сообщение и вызывается
+                  функция для выполнения следующего блока сценария
+
+    :param message: объект pyTelegramBotApi
+    :return: None
+    """
+
     try:
         date = Date.from_string(message.text)
         if Date.is_date_valid(date.day, date.month, date.year):
@@ -146,19 +245,51 @@ def get_check_out_date(message: Message) -> None:
 
 
 def get_adults(message: Message) -> None:
+
+    """
+    :get_min_price: функция, на вход подается сообщение
+                  с количеством взрослых гостей.
+                  Проверяется корректность ввода.
+                  Если не корректно, блок сценария повторяется.
+                  Данные записываются в атрибуты класса UserRequest.
+                  После чего предлагается ввести новое сообщение и вызывается
+                  функция для выполнения следующего блока сценария
+
+    :param message: объект pyTelegramBotApi
+    :return: None
+    """
+
     if message.text.isdigit():
         instance = dict_requests[message.chat.id]
         guests_list = []
         guests_list.append({'adults': int(message.text)})
         instance.adults = guests_list
         bot.send_message(message.from_user.id, 'Спасибо записал. Теперь введи количество детей')
-        bot.register_next_step_handler(message, get_childrens)
+        bot.register_next_step_handler(message, get_children)
     else:
         bot.send_message(message.from_user.id, 'Количество может быть только числом, введите еще раз')
         bot.register_next_step_handler(message, get_adults)
 
 
-def get_childrens(message: Message) -> None:
+def get_children(message: Message) -> None:
+
+    """
+    :get_min_price: функция, на вход подается сообщение
+                  с количеством детей гостей.
+                  Проверяется корректность ввода.
+                  Если не корректно, блок сценария повторяется.
+                  В случае если детей нет то
+                  данные записываются в атрибуты класса UserRequest.
+                  Формируется с ними сообщение и отправляются пользователю,
+                  и сценарий переходит к следующему блоку.
+                  В случае если есть дети, сценарий переходит к дополнительному блоку где предлагается
+                  ввести возраст каждого ребенка.
+
+
+    :param message: объект pyTelegramBotApi
+    :return: None
+    """
+
     if message.text.isdigit():
         instance = dict_requests[message.chat.id]
         instance.children_count = int(message.text)
@@ -179,10 +310,28 @@ def get_childrens(message: Message) -> None:
             get_hotels_list(message, msg)
     else:
         bot.send_message(message.from_user.id, 'Количество может быть только числом, введите еще раз')
-        bot.register_next_step_handler(message, get_childrens)
+        bot.register_next_step_handler(message, get_children)
 
 
 def get_children_age_list(message: Message):
+
+    """
+    :get_children_age_list: функция, на вход подается сообщение
+                  с возрастом первого ребенка.
+                  Проверяется корректность ввода.
+                  Если не корректно, блок сценария повторяется.
+                  В случае если ребенок один
+                  данные записываются в атрибуты класса UserRequest.
+                  Формируется с ними сообщение и отправляются пользователю,
+                  и сценарий переходит к следующему блоку.
+                  В случае если детей несколько, блок сценария повторяется пока не будет
+                  введен возраст каждого ребенка.
+
+
+    :param message: объект pyTelegramBotApi
+    :return: None
+    """
+
     if message.text.isdigit():
         instance = dict_requests[message.chat.id]
         instance.children_age_list.append({"age": int(message.text)})
@@ -216,8 +365,25 @@ def get_children_age_list(message: Message):
         bot.register_next_step_handler(message, get_children_age_list)
 
 
-
 def get_hotels_list(message: Message, msg: str) -> None:
+
+    """
+    :get_hotels_list: функция, на вход подается сообщение
+                  со всеми введенными данными.
+                  И выполняется попытка произвести API запрос
+                  с поиском отелей по заданным диапазонам и условиям.
+                  При неудачной попытке запроса предлагается начать снова, но не сначала,
+                   а с ввода диапазона цен.
+
+                  В случае успеха формируется список с найденными отелями и отправляется пользователю
+
+    :param
+        message: объект pyTelegramBotApi
+        msg (str): необходим для записи в поле БД в одну строку
+
+    :return: None
+    """
+
     try:
         instance = dict_requests[message.chat.id]
         create_json_with_hotels_propertys = HotelsID.set_propertys()
@@ -242,18 +408,33 @@ def get_hotels_list(message: Message, msg: str) -> None:
                            f'Название - {string[1]}\n' \
                            f'Стоимость - {string[2]}\n'
 
-        bot.send_message(message.from_user.id, f'Хотите посмотреть подробную информацию о конкретном отеле: да/нет\n')
-        bot.register_next_step_handler(message, stop_or_continue)
         data = [{"chat_id": message.chat.id,
                  "user_name": message.from_user.username,
                  "user_request": msg,
                  "bot_response": bot_message}]
         db_write(db, History, data)
+        bot.send_message(message.from_user.id, f'Хотите посмотреть подробную информацию о конкретном отеле: да/нет\n')
+        bot.register_next_step_handler(message, stop_or_continue)
+
     except TypeError:
-        print('Что то пошло не так, попробуйте сделать запрос снова')
+        bot.send_message(message.from_user.id, f'Что то пошло не так, попробуйте сделать запрос снова\n'
+                                               f'Минимальную цену за отель')
+        bot.register_next_step_handler(message, get_min_price)
 
 
 def stop_or_continue(message: Message) -> None:
+    """
+    :stop_or_continue: функция, на вход подается сообщение:
+                  да/нет.
+                  Проверяется корректность ввода,
+                  если пользователь отвечает "да", то предлагается ввести код заинтересовавшего
+                  отеля, и сценарий переходит к следующему блоку
+                  если пользователь отвечает "нет" то сценарий завершается
+
+    :param message: объект pyTelegramBotApi
+    :return: None
+    """
+
     if message.text.lower() == 'да':
         bot.send_message(message.from_user.id, f'Введите код отеля\n')
         bot.register_next_step_handler(message, get_hotel_info)
@@ -267,6 +448,26 @@ def stop_or_continue(message: Message) -> None:
 
 
 def get_hotel_info(message: Message) -> None:
+
+    """
+    :get_hotel_info: функция, на вход подается сообщение с кодом отеля.
+                     Производится попытка сделать API запрос
+                     в случае успеха пользователю отправляется подробная информация об отеле:
+                     точный адрес,
+                     местоположение на карте,
+                     фотографии.
+
+                     После выдачи информации предлагается ввести код следующего отеля,
+                     или завершить просмотр
+
+                     Конец сценария.
+
+
+    :param
+        message: объект pyTelegramBotApi
+    :return: None
+    """
+
     info = deteil_info(message.text)
     bot.send_message(message.from_user.id, f'Адрес отеля {info[0]}\n'
                                            f'Локация на карте {info[1]}\n')
@@ -275,11 +476,3 @@ def get_hotel_info(message: Message) -> None:
                                                f'{photo[1]}\n')
     bot.send_message(message.from_user.id, f'Хотите еще посмотреть подробную информацию о конкретном отеле: да/нет\n')
     bot.register_next_step_handler(message, stop_or_continue)
-
-
-
-
-
-
-
-
