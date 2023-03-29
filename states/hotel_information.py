@@ -11,6 +11,8 @@ class HotelInfoState(StatesGroup):
     min_price = State()
     max_price = State()
     childrens_age = State()
+    stop_or_continue = State()
+    get_hotel_info = State()
 
 
 
