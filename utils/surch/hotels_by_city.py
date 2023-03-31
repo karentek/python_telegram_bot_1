@@ -1,4 +1,4 @@
-from python_basic_diploma.utils.surch.API_request import ApiInterface
+from . API_request import ApiInterface
 import json
 from typing import Tuple
 

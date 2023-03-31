@@ -13,6 +13,7 @@ class HotelInfoState(StatesGroup):
     childrens_age = State()
     stop_or_continue = State()
     get_hotel_info = State()
+    best_deel = State()
 
 
 

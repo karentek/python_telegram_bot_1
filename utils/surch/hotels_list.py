@@ -1,4 +1,4 @@
-from python_basic_diploma.utils.surch.API_request import ApiInterface
+from . API_request import ApiInterface
 import json
 from typing import Tuple, List, Dict
 
@@ -28,11 +28,11 @@ def _hotels_propertys(region_id: str, guests: List[Dict], date_in: Dict, date_ou
         json.dump(responce, file, indent=4)
 
 
-def _hotels_list() -> List[Tuple[str, str, str]]:
+def _hotels_list() -> List[Tuple[str, str, str, float]]:
     with open("hotels_list.json", "r", encoding='UTF-8') as file_v2:
         responce = json.load(file_v2)
 
-        filtered_properties = [(item.get('id'), item.get('name'), str(int(item['price']['lead']['amount']))) for item in
+        filtered_properties = [(item.get('id'), item.get('name'), str(int(item['price']['lead']['amount'])), item['destinationInfo']['distanceFromDestination']['value']) for item in
                                responce['data']['propertySearch']['properties']]
         for string in filtered_properties:
             print(string)

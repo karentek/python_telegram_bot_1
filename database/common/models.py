@@ -17,9 +17,10 @@ class History(ModelBase):
         user_request (str): поисковый запрос пользователя
         bot_response (str): список отелей найденных по запросу пользователя
     """
-    chat_id = pw.TextField()
+    chat_id = pw.IntegerField()
     user_name = pw.TextField()
     user_request = pw.TextField()
     bot_response = pw.TextField()
+
 
 

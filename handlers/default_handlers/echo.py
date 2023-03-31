@@ -1,5 +1,5 @@
 from telebot.types import Message
-from python_basic_diploma.loader import bot
+from loader import bot
 
 
 @bot.message_handler(state=None)

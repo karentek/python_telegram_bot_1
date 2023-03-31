@@ -1,7 +1,7 @@
-from python_basic_diploma.loader import bot
-from python_basic_diploma.states.contact_information import UserInfoState
+from loader import bot
+from states.contact_information import UserInfoState
 from telebot.types import Message
-from python_basic_diploma.keyboards.reply.contact import request_contact
+from keyboards.reply.contact import request_contact
 
 @bot.message_handler(commands=["survey"])
 def survey(message: Message) -> None:

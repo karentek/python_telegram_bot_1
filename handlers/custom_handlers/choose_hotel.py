@@ -1,12 +1,12 @@
-from python_basic_diploma.loader import bot
+from loader import bot
 from telebot.types import Message
-from python_basic_diploma.utils.surch.hotels_by_city import LocationID
-from python_basic_diploma.utils.surch.hotels_list import HotelsID
-from python_basic_diploma.utils.check_date import Date
-from python_basic_diploma.database.common.models import db, History
-from python_basic_diploma.database.core import crud
-from python_basic_diploma.utils.surch.deteil_hotel_info import deteil_info
-from python_basic_diploma.states.hotel_information import HotelInfoState
+from utils.surch.hotels_by_city import LocationID
+from utils.surch.hotels_list import HotelsID
+from utils.check_date import Date
+from database.common.models import db, History
+from database.core import crud
+from utils.surch.deteil_hotel_info import deteil_info
+from states.hotel_information import HotelInfoState
 
 
 db_write = crud.create()
@@ -263,8 +263,6 @@ def get_children(message: Message) -> None:
                       f'Дата заселения: {data["check_in_date"]}\n' \
                       f'Дата выселения: {data["check_out_date"]}\n'
                 data['msg'] = msg
-                bot.send_message(message.from_user.id, f'Спасибо за предоставленную информацию, ваши данные\n')
-                bot.send_message(message.from_user.id, '{}'.format(msg))
                 get_hotels_list(message, msg)
     else:
         bot.send_message(message.from_user.id, 'Количество может быть только числом, введите еще раз')
@@ -336,6 +334,8 @@ def get_hotels_list(message: Message, msg: str) -> None:
 
     :return: None
     """
+    bot.send_message(message.from_user.id, f'Спасибо за предоставленную информацию, ваши данные\n')
+    bot.send_message(message.from_user.id, '{}'.format(msg))
 
     try:
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
@@ -355,81 +355,27 @@ def get_hotels_list(message: Message, msg: str) -> None:
         bot_message = ''
         for string in hotels_list:
             bot.send_message(message.from_user.id, f'Код - {string[0]}\n'
-                                                   f'Название - {string[1]}\n'
-                                                   f'Стоимость - {string[2]}\n')
+                                                   f'{string[1]}\n'
+                                                   f'${string[2]}\n'
+                                                   f'До центра города - {string[3]} км.\n'
+                                                   f'')
             bot_message += f'Код - {string[0]}\n' \
-                           f'Название - {string[1]}\n' \
-                           f'Стоимость - {string[2]}\n'
+                           f'{string[1]}\n' \
+                           f'${string[2]}\n' \
+                           f'До центра города - {string[3]} км.\n' \
+                           f''
 
         data_db = [{"chat_id": message.chat.id,
                  "user_name": message.from_user.username,
                  "user_request": msg,
                  "bot_response": bot_message}]
         db_write(db, History, data_db)
-        bot.send_message(message.from_user.id, f'Хотите посмотреть подробную информацию о конкретном отеле: да/нет\n')
-        bot.set_state(message.from_user.id, HotelInfoState.stop_or_continue, message.chat.id)
+        bot.send_message(message.from_user.id, f'Для дальнейшей работы выберите пункт меню')
+        bot.delete_state(message.from_user.id, message.chat.id)
+
 
     except TypeError:
         bot.send_message(message.from_user.id, f'Что то пошло не так, попробуйте сделать запрос снова\n'
                                                f'Введите минимальную цену за отель')
         bot.set_state(message.from_user.id, HotelInfoState.min_price, message.chat.id)
 
-
-@bot.message_handler(state=[HotelInfoState.stop_or_continue])
-def stop_or_continue(message: Message) -> None:
-    """
-    :stop_or_continue: обработчик ожидает сообщение:
-                  да/нет.
-                  Проверяется корректность ввода,
-                  если пользователь отвечает "да", то предлагается ввести код заинтересовавшего
-                  отеля, и сценарий переходит к следующему блоку
-                  если пользователь отвечает "нет" то сценарий завершается
-
-    :param message: объект pyTelegramBotApi
-    :return: None
-    """
-
-    if message.text.lower() == 'да':
-        bot.send_message(message.from_user.id, f'Введите код отеля\n')
-        bot.set_state(message.from_user.id, HotelInfoState.get_hotel_info, message.chat.id)
-    elif message.text.lower() == 'нет':
-        bot.send_message(message.from_user.id, f'Спасибо {message.from_user.username}\n'
-                                               f'Поиск отелей завершен. Можете воспользоваться'
-                                               f' другими функциями нажав кнопку "menu"\n')
-        bot.delete_state(message.from_user.id, message.chat.id)
-
-    else:
-        bot.send_message(message.from_user.id, f'неверный ввод, введите да или нет\n')
-
-@bot.message_handler(state=[HotelInfoState.get_hotel_info])
-def get_hotel_info(message: Message) -> None:
-
-    """
-    :get_hotel_info: обработчик ожидает сообщение с кодом отеля.
-                     Производится попытка сделать API запрос
-                     в случае успеха пользователю отправляется подробная информация об отеле:
-                     - точный адрес,
-                     - местоположение на карте,
-                     - фотографии.
-
-    :param
-        message: объект pyTelegramBotApi
-    :return: None
-    """
-    try:
-        info = deteil_info(message.text)
-        if not info:
-            raise Exception
-        bot.send_message(message.from_user.id, f'Адрес отеля {info[0]}\n'
-                                               f'Локация на карте {info[1]}\n')
-        for photo in info[2]:
-            bot.send_message(message.from_user.id, f'{photo[0]}\n'
-                                                   f'{photo[1]}\n')
-        bot.send_message(message.from_user.id,
-                         f'Хотите еще посмотреть подробную информацию о конкретном отеле: да/нет\n')
-        bot.set_state(message.from_user.id, HotelInfoState.stop_or_continue, message.chat.id)
-
-    except Exception:
-        bot.send_message(message.from_user.id,
-                         f'Сервер не распознал введенный код, попробуйте еще раз\n')
-        bot.set_state(message.from_user.id, HotelInfoState.get_hotel_info, message.chat.id)

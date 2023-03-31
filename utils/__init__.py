@@ -1,1 +1,1 @@
-from python_basic_diploma.utils import misc
+from utils import misc

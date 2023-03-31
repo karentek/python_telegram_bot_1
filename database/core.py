@@ -1,5 +1,5 @@
-from python_basic_diploma.database.common.models import db, History
-from python_basic_diploma.database.utils.CRUD import CRUDInterface
+from . common.models import db, History
+from . utils.CRUD import CRUDInterface
 
 
 db.connect()

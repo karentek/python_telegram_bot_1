@@ -1,6 +1,7 @@
-from python_basic_diploma.utils.surch.API_request import ApiInterface
+from . API_request import ApiInterface
 import json
-from typing import Tuple, List, Dict
+from typing import Tuple, List
+
 def _deteil(id: str) -> Tuple[str, str, List[Tuple[str, str]]]:
     payload = {
         "currency": "USD",

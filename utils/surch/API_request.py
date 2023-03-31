@@ -1,6 +1,6 @@
 import requests
-from python_basic_diploma.config_data.config import RAPID_API_KEY
 from typing import Dict
+from config_data.config import RAPID_API_KEY
 
 def _super_request(end_point: str, method: str, params: dict):
 	url = "https://hotels4.p.rapidapi.com" + end_point
