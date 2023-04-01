@@ -304,9 +304,6 @@ def get_children_age_list(message: Message):
                                                 data['max_price'],
                                                 data['check_in_date'],
                                                 data['check_out_date'])
-            bot.send_message(message.from_user.id, f'Спасибо за предоставленную информацию, '
-                                                   f'ваши данные:\n')
-            bot.send_message(message.from_user.id, '{}'.format(msg))
             get_hotels_list(message, msg)
         else:
             bot.send_message(message.chat.id, f'Введите возраст {len(data["children_age_list"])+1}-го ребенка:')
