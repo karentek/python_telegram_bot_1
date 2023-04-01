@@ -11,7 +11,7 @@ from states.hotel_information import HotelInfoState
 
 db_write = crud.create()
 
-@bot.message_handler(commands=["choose_a_hotel"])
+@bot.message_handler(commands=["custom"])
 def choose_hotel(message: Message) -> None:
 
     """
