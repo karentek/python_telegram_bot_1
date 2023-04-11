@@ -3,7 +3,7 @@ from telebot.types import Message
 from utils.surch.hotels_by_city import LocationID
 from utils.surch.hotels_list import HotelsID
 from utils.check_date import Date
-from database.common.models import db, History
+from database.common.models import db, History, Flag, db_unicodes
 from database.core import crud
 from utils.surch.deteil_hotel_info import deteil_info
 from states.hotel_information import HotelInfoState
@@ -74,9 +74,11 @@ def get_city_(message: Message) -> None:
                 create_json_with_location_id(data['city'], data['country'])
                 get_location_id = LocationID.get_id()
                 id = get_location_id()
+                print(id)
                 if not id:
                     raise Exception
                 data['city_id'] = id
+                print(data['city_id'])
             bot.send_message(message.from_user.id, 'Спасибо записал. Теперь введи минимальную стоимость')
             bot.set_state(message.from_user.id, HotelInfoState.min_price, message.chat.id)
         except Exception:
@@ -255,15 +257,22 @@ def get_children(message: Message) -> None:
                 bot.send_message(message.from_user.id, f'Введите возраст каждого ребенка:')
                 bot.set_state(message.from_user.id, HotelInfoState.childrens_age, message.chat.id)
             else:
-                msg = f'Страна поиска: {data["country"]}\n' \
-                      f'Город поиска: {data["city"]}\n' \
-                      f'Взрослые: {data["adults"]}\n' \
-                      f'Минимальная цена: {data["min_price"]}\n' \
-                      f'Максимальная цена: {data["max_price"]}\n' \
-                      f'Дата заселения: {data["check_in_date"]}\n' \
-                      f'Дата выселения: {data["check_out_date"]}\n'
+                msg = '{} - {}\n' \
+                      'Взрослые - {}\n' \
+                      'Диапазон цен: {} - {}\n' \
+                      'Даты пребывания: {}.{}.{} ' \
+                      '- {}.{}.{}\n'.format(
+                                            data['country'], data['city'],
+                                            data['adults'][0]["adults"],
+                                            data['min_price'], data['max_price'],
+                                            data['check_in_date']['day'], data['check_in_date']['month'], data['check_in_date']['year'],
+                                            data['check_out_date']['day'], data['check_out_date']['month'], data['check_out_date']['year']
+                )
+
                 data['msg'] = msg
-                get_hotels_list(message, msg)
+                bot.send_message(message.chat.id, f'Сколько отелей вывести в результате?\nМаксимум 10')
+                bot.set_state(message.from_user.id, HotelInfoState.hotels_count, message.chat.id)
+
     else:
         bot.send_message(message.from_user.id, 'Количество может быть только числом, введите еще раз')
 
@@ -289,22 +298,18 @@ def get_children_age_list(message: Message):
         if len(data['children_age_list']) == data['children_count']:
             data['adults'][0]["children"] = data['children_age_list']
             print(data['adults'])
-            msg = 'Страна поиска: {}\n' \
-                  'Город поиска: {}\n' \
-                  'Взрослые: {}\n' \
-                  'Дети: {}\n' \
-                  'Минимальная цена: {}\n' \
-                  'Максимальная цена: {}\n' \
-                  'Дата заселения: {}\n' \
-                  'Дата выселения: {}\n'.format(data['country'],
-                                                data['city'],
-                                                data['adults'][0]["adults"],
-                                                data['children_count'],
-                                                data['min_price'],
-                                                data['max_price'],
-                                                data['check_in_date'],
-                                                data['check_out_date'])
-            get_hotels_list(message, msg)
+            msg = '{} - {}\n' \
+                  'Взрослые - {}, дети - {}\n' \
+                  'Диапазон цен: {} - {}\n' \
+                  'Даты пребывания: {}.{}.{} - {}.{}.{}\n'.format(
+                                                data['country'], data['city'],
+                                                data['adults'][0]["adults"], data['children_count'],
+                                                data['min_price'], data['max_price'],
+                                                data['check_in_date']['day'], data['check_in_date']['month'], data['check_in_date']['year'],
+                                                data['check_out_date']['day'], data['check_out_date']['month'], data['check_out_date']['year'])
+            data['msg'] = msg
+            bot.send_message(message.chat.id, f'Сколько отелей вывести в результате?\nМаксимум 10')
+            bot.set_state(message.from_user.id, HotelInfoState.hotels_count, message.chat.id)
         else:
             bot.send_message(message.chat.id, f'Введите возраст {len(data["children_age_list"])+1}-го ребенка:')
             bot.set_state(message.from_user.id, HotelInfoState.childrens_age, message.chat.id)
@@ -313,7 +318,63 @@ def get_children_age_list(message: Message):
         bot.send_message(message.from_user.id, 'Количество может быть только числом, введите еще раз')
 
 
-def get_hotels_list(message: Message, msg: str) -> None:
+@bot.message_handler(state=[HotelInfoState.hotels_count])
+def get_hotels_count(message: Message) -> None:
+    """
+    :get_min_price: обработчик ожидает сообщение
+                  с минимальной приемлемой для пользователя стоимостью
+                  проверяется правильность ввода, а именно:
+                  сообщение должно состоять только из цифр.
+                  Если условие не выполняется, блок сценария повторяется. В противном случае
+                  предлагается ввести новое сообщение и вызывается
+                  функция для выполнения следующего блока сценария
+
+    :param message: объект pyTelegramBotApi
+    :return: None
+    """
+
+    if message.text.isdigit():
+
+        bot.send_message(message.from_user.id, 'Спасибо записал. Сколько фотографий вывести к каждому отелю'
+                                               '\nМаксимум 10')
+        bot.set_state(message.from_user.id, HotelInfoState.photos_count, message.chat.id)
+        with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+            if 0 < int(message.text) <= 10:
+                data['hotels_count'] = int(message.text)
+            else:
+                data['hotels_count'] = 10
+    else:
+        bot.send_message(message.from_user.id, 'Количество может быть только числом, попробуйте ввести еще раз')
+
+@bot.message_handler(state=[HotelInfoState.photos_count])
+def get_photos_count(message: Message) -> None:
+    """
+    :get_min_price: обработчик ожидает сообщение
+                  с минимальной приемлемой для пользователя стоимостью
+                  проверяется правильность ввода, а именно:
+                  сообщение должно состоять только из цифр.
+                  Если условие не выполняется, блок сценария повторяется. В противном случае
+                  предлагается ввести новое сообщение и вызывается
+                  функция для выполнения следующего блока сценария
+
+    :param message: объект pyTelegramBotApi
+    :return: None
+    """
+
+    if message.text.isdigit():
+        bot.send_message(message.from_user.id, 'Спасибо записал. Формирую список отелей...')
+        with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
+            if 0 < int(message.text) <= 10:
+                data['photos_count'] = int(message.text)
+            else:
+                data['photos_count'] = 10
+        get_hotels_list(message)
+    else:
+        bot.send_message(message.from_user.id, 'Количество может быть только числом, попробуйте ввести еще раз')
+
+
+
+def get_hotels_list(message: Message) -> None:
 
     """
     :get_hotels_list: функция, на вход подается сообщение
@@ -331,8 +392,7 @@ def get_hotels_list(message: Message, msg: str) -> None:
 
     :return: None
     """
-    bot.send_message(message.from_user.id, f'Спасибо за предоставленную информацию, ваши данные\n')
-    bot.send_message(message.from_user.id, '{}'.format(msg))
+
 
     try:
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
@@ -347,32 +407,49 @@ def get_hotels_list(message: Message, msg: str) -> None:
 
             hotels_list = HotelsID.get_hotels_list()
             hotels_list = hotels_list()
+
             print('ID города {}. название {}'.format(data['city_id'][0], data['city_id'][1]))
         bot.send_message(message.from_user.id, f'Список найденных отелей:\n')
         bot_message = ''
-        for string in hotels_list:
-            bot.send_message(message.from_user.id, f'Код - {string[0]}\n'
-                                                   f'{string[1]}\n'
-                                                   f'${string[2]}\n'
-                                                   f'До центра города - {string[3]} км.\n'
-                                                   f'')
-            bot_message += f'Код - {string[0]}\n' \
-                           f'{string[1]}\n' \
-                           f'${string[2]}\n' \
-                           f'До центра города - {string[3]} км.\n' \
-                           f''
+        country_code = data['city_id'][2]
+        retrieved = Flag.select().where(Flag.country_name == country_code).get()
 
-        data_db = [{"chat_id": message.chat.id,
+        if retrieved:
+            flag = retrieved.iso_code
+        else:
+            flag = '***'
+        if len(hotels_list) < data['hotels_count']:
+            data['hotels_count'] = len(hotels_list)
+        for i_count in range(0, data['hotels_count']):
+            info = deteil_info(hotels_list[i_count][0])
+            bot.send_message(message.from_user.id, f'{flag} {flag} {flag} Отель №{i_count + 1} {flag} {flag} {flag}\n'
+                                                   f'{hotels_list[i_count][1]} - '
+                                                   f'${hotels_list[i_count][2]}\n'
+                                                   f'До центра города - {hotels_list[i_count][3]} км.\n'
+                                                   f'Адрес отеля {info[0]}\n')
+            if data['photos_count'] > 0:
+                for i_photo in range(0, data['photos_count']):
+                    bot.send_message(message.from_user.id, f'{info[2][i_photo]}\n')
+
+            bot_message += f'{flag} {flag} {flag} Отель №{i_count + 1} {flag} {flag} {flag}\n' \
+                           f'\n' \
+                           f'{hotels_list[i_count][1]} - ' \
+                           f'${hotels_list[i_count][2]}\n' \
+                           f'До центра города - {hotels_list[i_count][3]} км.\n' \
+                           f'Код отеля: {hotels_list[i_count][0]}\n' \
+                           f'\n'
+
+        data_db = [{
+                 "chat_id": message.chat.id,
                  "user_name": message.from_user.username,
-                 "user_request": msg,
+                 "user_request": data['msg'],
                  "bot_response": bot_message}]
+
         db_write(db, History, data_db)
         bot.send_message(message.from_user.id, f'Для дальнейшей работы выберите пункт меню')
         bot.delete_state(message.from_user.id, message.chat.id)
-
 
     except TypeError:
         bot.send_message(message.from_user.id, f'Что то пошло не так, попробуйте сделать запрос снова\n'
                                                f'Введите минимальную цену за отель')
         bot.set_state(message.from_user.id, HotelInfoState.min_price, message.chat.id)
-

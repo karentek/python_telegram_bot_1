@@ -1,7 +1,9 @@
 from . API_request import ApiInterface
 import json
 from typing import Tuple, List, Dict
+import os
 
+path = os.path.abspath(os.path.join('utils', 'files', 'hotels_list.json'))
 
 def _hotels_propertys(region_id: str, guests: List[Dict], date_in: Dict, date_out: Dict, min_price: int = 1, max_price: int = 1000) -> None:
 
@@ -24,12 +26,12 @@ def _hotels_propertys(region_id: str, guests: List[Dict], date_in: Dict, date_ou
     }
     request = ApiInterface.super_request()
     responce = request('/properties/v2/list', 'POST', payload)
-    with open("hotels_list.json", "w") as file:
+    with open(path, "w+") as file:
         json.dump(responce, file, indent=4)
 
 
 def _hotels_list() -> List[Tuple[str, str, str, float]]:
-    with open("hotels_list.json", "r", encoding='UTF-8') as file_v2:
+    with open(path, "r", encoding='UTF-8') as file_v2:
         responce = json.load(file_v2)
 
         filtered_properties = [(item.get('id'), item.get('name'), str(int(item['price']['lead']['amount'])), item['destinationInfo']['distanceFromDestination']['value']) for item in

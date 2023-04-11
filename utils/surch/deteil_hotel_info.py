@@ -1,6 +1,9 @@
+import os
 from . API_request import ApiInterface
 import json
 from typing import Tuple, List
+
+path = os.path.abspath(os.path.join('utils', 'files', 'deteil_hotel_info.json'))
 
 def _deteil(id: str) -> Tuple[str, str, List[Tuple[str, str]]]:
     payload = {
@@ -14,10 +17,10 @@ def _deteil(id: str) -> Tuple[str, str, List[Tuple[str, str]]]:
     request = ApiInterface.super_request()
     responce = request('/properties/v2/detail', 'POST', payload)
 
-    with open("deteil_hotel_info.json", "w") as file:
+    with open(path, "w+") as file:
         json.dump(responce, file, indent=4)
 
-    with open("deteil_hotel_info.json", "r") as file_v2D:
+    with open(path, "r") as file_v2D:
         response = json.load(file_v2D)
         adress = response['data']['propertyInfo']['summary']['location']['address']['addressLine']
         view_in_map_link = response['data']['propertyInfo']['summary']['location']['staticImage']['url']

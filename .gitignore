@@ -136,3 +136,11 @@ dmypy.json
 /deteil_hotel_info.json
 /hotels_by_city.json
 /hotels_list.json
+/utils/files/database.db
+/utils/files/deteil_hotel_info.json
+/utils/files/file.txt
+/utils/files/hotels_by_city.json
+/utils/files/hotels_list.json
+/utils/files/unicodes.db
+/handlers/custom_handlers/test_flags.py
+/handlers/custom_handlers/tester_handler.py
