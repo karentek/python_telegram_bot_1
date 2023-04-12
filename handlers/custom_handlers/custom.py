@@ -1,3 +1,4 @@
+import datetime
 from datetime import date
 from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 from loader import bot
@@ -19,6 +20,7 @@ class MyStyleCalendar(DetailedTelegramCalendar):
     # you do not want empty cells when month and year are being selected
     empty_month_button = ""
     empty_year_button = ""
+    empty_day_button = ""
 
 @bot.message_handler(commands=["custom"])
 def choose_hotel(message: Message) -> None:
@@ -139,13 +141,14 @@ def get_max_price(message: Message) -> None:
     """
 
     if message.text.isdigit():
+        m_date = date.today() + datetime.timedelta(days=365)
         bot.set_state(message.from_user.id, HotelInfoState.date_chack_in, message.chat.id)
-        calendar, step = MyStyleCalendar(calendar_id=1, locale='ru', min_date=date.today()).build()
+        calendar, step = MyStyleCalendar(calendar_id=1, locale='ru', min_date=date.today(), max_date=m_date).build()
         bot.send_message(message.chat.id,
                          f"Введи дату заселения {LSTEP[step]}",
                          reply_markup=calendar)
-        bot.set_state(message.from_user.id, HotelInfoState.date_chack_out, message.chat.id)
-        calendar, step = MyStyleCalendar(calendar_id=2, locale='ru', min_date=date.today()).build()
+        # bot.set_state(message.from_user.id, HotelInfoState.date_chack_out, message.chat.id)
+        calendar, step = MyStyleCalendar(calendar_id=2, locale='ru', min_date=date.today(), max_date=m_date).build()
         bot.send_message(message.chat.id,
                          f"Введи дату выселения {LSTEP[step]}",
                          reply_markup=calendar)
