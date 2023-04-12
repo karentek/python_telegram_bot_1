@@ -9,15 +9,14 @@ from database.common.models import db, History, Flag
 from database.core import crud
 from utils.surch.deteil_hotel_info import deteil_info
 from states.hotel_information import HotelInfoState
+from loguru import logger
 
 
 db_write = crud.create()
 
 class MyStyleCalendar(DetailedTelegramCalendar):
-    # previous and next buttons style. they are emoji now!
     prev_button = "⬅️"
     next_button = "➡️"
-    # you do not want empty cells when month and year are being selected
     empty_month_button = ""
     empty_year_button = ""
     empty_day_button = ""
@@ -26,14 +25,14 @@ class MyStyleCalendar(DetailedTelegramCalendar):
 def choose_hotel(message: Message) -> None:
 
     """
-    Сценарий обработчиков сообщений запускается командой choose_a_hotel
+    Сценарий обработчиков сообщений запускается командой custom
     в данном блоке пользователю предлагается ввести название страны для последующей обработки в
     следующем шаге сценария
 
     :param message: объект pyTelegramBotApi
     :return: None
     """
-
+    logger.info("Успешный запуск custom")
     bot.set_state(message.from_user.id, HotelInfoState.country, message.chat.id)
     bot.send_message(message.from_user.id, f'{message.from_user.username}, введи страну для поиска отеля')
 
@@ -51,7 +50,7 @@ def get_country_(message: Message) -> None:
     :param message: объект pyTelegramBotApi
     :return: None
     """
-
+    logger.info("Введено название страны")
     if message.text.isalpha():
         bot.send_message(message.from_user.id, 'Спасибо записал. Теперь введи город')
         bot.set_state(message.from_user.id, HotelInfoState.city, message.chat.id)
@@ -77,6 +76,7 @@ def get_city_(message: Message) -> None:
     :param message:
     :return:
     """
+    logger.info("Введено название города")
     if message.text.isalpha():
         try:
             with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
@@ -115,7 +115,7 @@ def get_min_price(message: Message) -> None:
     :param message: объект pyTelegramBotApi
     :return: None
     """
-
+    logger.info("Введена минимальная цена")
     if message.text.isdigit():
         bot.send_message(message.from_user.id, 'Спасибо записал. Теперь введи максимальную стоимость')
         bot.set_state(message.from_user.id, HotelInfoState.max_price, message.chat.id)
@@ -139,7 +139,7 @@ def get_max_price(message: Message) -> None:
     :param message: объект pyTelegramBotApi
     :return: None
     """
-
+    logger.info("Введена максимальная цена, вывод календарей на экран")
     if message.text.isdigit():
         m_date = date.today() + datetime.timedelta(days=365)
         bot.set_state(message.from_user.id, HotelInfoState.date_chack_in, message.chat.id)
@@ -147,7 +147,6 @@ def get_max_price(message: Message) -> None:
         bot.send_message(message.chat.id,
                          f"Введи дату заселения {LSTEP[step]}",
                          reply_markup=calendar)
-        # bot.set_state(message.from_user.id, HotelInfoState.date_chack_out, message.chat.id)
         calendar, step = MyStyleCalendar(calendar_id=2, locale='ru', min_date=date.today(), max_date=m_date).build()
         bot.send_message(message.chat.id,
                          f"Введи дату выселения {LSTEP[step]}",
@@ -164,7 +163,7 @@ def get_max_price(message: Message) -> None:
 
 @bot.callback_query_handler(func=MyStyleCalendar.func(calendar_id=1))
 def cal1(c):
-
+    logger.info("Календарь 1")
     result, key, step = MyStyleCalendar(calendar_id=1, locale='ru', min_date=date.today()).process(c.data)
     if not result and key:
         bot.edit_message_text(f"Введи дату заселения {LSTEP[step]}",
@@ -187,6 +186,8 @@ def cal1(c):
 
 @bot.callback_query_handler(func=MyStyleCalendar.func(calendar_id=2))
 def cal1(c):
+    logger.info("Календарь 2")
+
     result, key, step = MyStyleCalendar(calendar_id=2, locale='ru', min_date=date.today()).process(c.data)
     if not result and key:
         bot.edit_message_text(f"Введите дату выселения {LSTEP[step]}",
@@ -221,7 +222,7 @@ def get_adults(message: Message) -> None:
     :param message: объект pyTelegramBotApi
     :return: None
     """
-
+    logger.info("Введено количество взрослых")
     if message.text.isdigit():
         bot.send_message(message.from_user.id, 'Спасибо записал. Теперь введи количество детей')
         bot.set_state(message.from_user.id, HotelInfoState.childrens, message.chat.id)
@@ -249,6 +250,7 @@ def get_children(message: Message) -> None:
     :return: None
     """
 
+    logger.info("Введено количество детей")
     if message.text.isdigit():
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['children_count'] = int(message.text)
@@ -292,7 +294,7 @@ def get_children_age_list(message: Message):
     :param message: объект pyTelegramBotApi
     :return: None
     """
-
+    logger.info("Создается список детей и их возрастов")
     if message.text.isdigit():
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['children_age_list'].append({"age": int(message.text)})
@@ -336,6 +338,7 @@ def get_hotels_count(message: Message) -> None:
     :return: None
     """
 
+    logger.info("Вводится колличество отелей на выдачу")
     if message.text.isdigit():
 
         bot.send_message(message.from_user.id, 'Спасибо записал. Сколько фотографий вывести к каждому отелю'
@@ -364,6 +367,7 @@ def get_photos_count(message: Message) -> None:
     :return: None
     """
 
+    logger.info("Вводится колличество фотографий на выдачу")
     if message.text.isdigit():
         bot.send_message(message.from_user.id, 'Спасибо записал. Формирую список отелей...')
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
@@ -393,6 +397,8 @@ def get_hotels_list(message: Message) -> None:
 
     :return: None
     """
+
+    logger.info("Отправляются собранные данные для выполнения запроса API")
     try:
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             create_json_with_hotels_propertys = HotelsID.set_propertys()
@@ -410,6 +416,7 @@ def get_hotels_list(message: Message) -> None:
             print('ID города {}. название {}'.format(data['city_id'][0], data['city_id'][1]))
         bot_message = ''
         country_code = data['city_id'][2]
+        logger.info("Ищем смайлик флаг в БД")
         retrieved = Flag.select().where(Flag.country_name == country_code).get()
 
         if retrieved:
@@ -418,6 +425,8 @@ def get_hotels_list(message: Message) -> None:
             flag = '***'
         if len(hotels_list) < data['hotels_count']:
             data['hotels_count'] = len(hotels_list)
+        logger.info("Отправляем сообщения пользователю")
+
         for i_count in range(0, data['hotels_count']):
             info = deteil_info(hotels_list[i_count][0])
             bot.send_message(message.from_user.id, f'{flag} {flag} {flag} Отель №{i_count + 1} {flag} {flag} {flag}\n'
@@ -436,7 +445,7 @@ def get_hotels_list(message: Message) -> None:
                            f'До центра города - {hotels_list[i_count][3]} км.\n' \
                            f'Код отеля: {hotels_list[i_count][0]}\n' \
                            f'\n'
-
+        logger.info("Записываем сообщение в историю")
         data_db = [{
                  "chat_id": message.chat.id,
                  "user_name": message.from_user.username,

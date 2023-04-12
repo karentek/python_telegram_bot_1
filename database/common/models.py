@@ -2,6 +2,7 @@ import peewee as pw
 from datetime import datetime
 import os
 import pandas as pd
+from loguru import logger
 
 
 path_hotels = os.path.abspath(os.path.join('utils', 'files', 'database.db'))
@@ -43,6 +44,8 @@ class Flag(pw.Model):
 
 
 if not Flag.table_exists():
+    logger.info("Создаем базу данных с флагами")
+
     Flag.create_table()
     tables = pd.read_html('https://unicode.bootstrap-4.ru/emoji/flags/')
     tables[1].drop(('№'), axis=1, inplace=True)

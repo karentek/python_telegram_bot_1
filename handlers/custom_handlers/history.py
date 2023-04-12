@@ -33,8 +33,6 @@ def choose_hotel(message: Message) -> None:
                                                                f'Сузьте диапазон этого запроса чтобы '
                                                                f'можно было корректно вывести список '
                                                                f'отелей на экран')
-        elif len(retrieved) == 10:
-            bot.send_message(message.from_user.id, f'Пока не было ни одного запроса\n')
         else:
             for element in retrieved:
                 if len(element.bot_response) < 4096:
