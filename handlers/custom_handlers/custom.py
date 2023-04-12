@@ -12,6 +12,14 @@ from states.hotel_information import HotelInfoState
 
 db_write = crud.create()
 
+class MyStyleCalendar(DetailedTelegramCalendar):
+    # previous and next buttons style. they are emoji now!
+    prev_button = "⬅️"
+    next_button = "➡️"
+    # you do not want empty cells when month and year are being selected
+    empty_month_button = ""
+    empty_year_button = ""
+
 @bot.message_handler(commands=["custom"])
 def choose_hotel(message: Message) -> None:
 
@@ -132,12 +140,12 @@ def get_max_price(message: Message) -> None:
 
     if message.text.isdigit():
         bot.set_state(message.from_user.id, HotelInfoState.date_chack_in, message.chat.id)
-        calendar, step = DetailedTelegramCalendar(calendar_id=1, locale='ru', min_date=date.today()).build()
+        calendar, step = MyStyleCalendar(calendar_id=1, locale='ru', min_date=date.today()).build()
         bot.send_message(message.chat.id,
                          f"Введи дату заселения {LSTEP[step]}",
                          reply_markup=calendar)
         bot.set_state(message.from_user.id, HotelInfoState.date_chack_out, message.chat.id)
-        calendar, step = DetailedTelegramCalendar(calendar_id=2, locale='ru', min_date=date.today()).build()
+        calendar, step = MyStyleCalendar(calendar_id=2, locale='ru', min_date=date.today()).build()
         bot.send_message(message.chat.id,
                          f"Введи дату выселения {LSTEP[step]}",
                          reply_markup=calendar)
@@ -151,10 +159,10 @@ def get_max_price(message: Message) -> None:
         bot.send_message(message.from_user.id, 'Цена может быть только числом, попробуйте ввести еще раз')
 
 
-@bot.callback_query_handler(func=DetailedTelegramCalendar.func(calendar_id=1))
+@bot.callback_query_handler(func=MyStyleCalendar.func(calendar_id=1))
 def cal1(c):
 
-    result, key, step = DetailedTelegramCalendar(calendar_id=1).process(c.data)
+    result, key, step = MyStyleCalendar(calendar_id=1, locale='ru', min_date=date.today()).process(c.data)
     if not result and key:
         bot.edit_message_text(f"Введи дату заселения {LSTEP[step]}",
                               c.message.chat.id,
@@ -174,9 +182,9 @@ def cal1(c):
             with bot.retrieve_data(c.from_user.id, c.message.chat.id) as data:
                 data['check_in_date']["year"] = result.year
 
-@bot.callback_query_handler(func=DetailedTelegramCalendar.func(calendar_id=2))
+@bot.callback_query_handler(func=MyStyleCalendar.func(calendar_id=2))
 def cal1(c):
-    result, key, step = DetailedTelegramCalendar(calendar_id=2, locale='ru').process(c.data)
+    result, key, step = MyStyleCalendar(calendar_id=2, locale='ru', min_date=date.today()).process(c.data)
     if not result and key:
         bot.edit_message_text(f"Введите дату выселения {LSTEP[step]}",
                               c.message.chat.id,
