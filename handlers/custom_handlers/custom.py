@@ -1,9 +1,10 @@
+from datetime import date
+from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 from loader import bot
 from telebot.types import Message
 from utils.surch.hotels_by_city import LocationID
 from utils.surch.hotels_list import HotelsID
-from utils.check_date import Date
-from database.common.models import db, History, Flag, db_unicodes
+from database.common.models import db, History, Flag
 from database.core import crud
 from utils.surch.deteil_hotel_info import deteil_info
 from states.hotel_information import HotelInfoState
@@ -130,82 +131,70 @@ def get_max_price(message: Message) -> None:
     """
 
     if message.text.isdigit():
-        bot.send_message(message.from_user.id, 'Спасибо записал. Теперь введи дату заселения\n'
-                                               'Правильный формат: dd.mm.yyyy\n')
         bot.set_state(message.from_user.id, HotelInfoState.date_chack_in, message.chat.id)
+        calendar, step = DetailedTelegramCalendar(calendar_id=1, locale='ru', min_date=date.today()).build()
+        bot.send_message(message.chat.id,
+                         f"Введи дату заселения {LSTEP[step]}",
+                         reply_markup=calendar)
+        bot.set_state(message.from_user.id, HotelInfoState.date_chack_out, message.chat.id)
+        calendar, step = DetailedTelegramCalendar(calendar_id=2, locale='ru', min_date=date.today()).build()
+        bot.send_message(message.chat.id,
+                         f"Введи дату выселения {LSTEP[step]}",
+                         reply_markup=calendar)
+        bot.send_message(message.from_user.id, 'Введи количество взрослых')
+        bot.set_state(message.from_user.id, HotelInfoState.adults, message.chat.id)
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             data['max_price'] = int(message.text)
+            data['check_out_date'] = {}
+            data['check_in_date'] = {}
     else:
         bot.send_message(message.from_user.id, 'Цена может быть только числом, попробуйте ввести еще раз')
 
-@bot.message_handler(state=[HotelInfoState.date_chack_in])
-def get_check_in_date(message: Message) -> None:
 
-    """
-    :get_check_in_date: обработчик ожидает сообщение
-                  с датой заселения.
-                  Проверяется корректность ввода даты, с помощью методов класса Date
-                  Если дата была введена не корректно, блок сценария повторяется.
-                  После чего предлагается ввести новое сообщение и вызывается
-                  обработчик для выполнения следующего блока сценария
+@bot.callback_query_handler(func=DetailedTelegramCalendar.func(calendar_id=1))
+def cal1(c):
 
-    :param message: объект pyTelegramBotApi
-    :return: None
-    """
+    result, key, step = DetailedTelegramCalendar(calendar_id=1).process(c.data)
+    if not result and key:
+        bot.edit_message_text(f"Введи дату заселения {LSTEP[step]}",
+                              c.message.chat.id,
+                              c.message.message_id,
+                              reply_markup=key)
+    elif result:
+        bot.edit_message_text(f"{result}",
+                              c.message.chat.id,
+                              c.message.message_id)
+        if result.day:
+            with bot.retrieve_data(c.from_user.id, c.message.chat.id) as data:
+                data['check_in_date']["day"] = result.day
+        if result.month:
+            with bot.retrieve_data(c.from_user.id, c.message.chat.id) as data:
+                data['check_in_date']["month"] = result.month
+        if result.year:
+            with bot.retrieve_data(c.from_user.id, c.message.chat.id) as data:
+                data['check_in_date']["year"] = result.year
 
-    try:
-        date = Date.from_string(message.text)
-        if Date.is_date_valid(date.day, date.month, date.year):
-            bot.send_message(message.from_user.id,  'Спасибо записал. Теперь введи дату выселения\n'
-                                                    'Правильный формат: dd.mm.yyyy\n')
-            bot.set_state(message.from_user.id, HotelInfoState.date_chack_out, message.chat.id)
-            with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-                check_in_dict = dict()
-                check_in_dict["day"] = date.day
-                check_in_dict["month"] = date.month
-                check_in_dict["year"] = date.year
-                data['check_in_date'] = check_in_dict
-
-        else:
-            bot.send_message(message.from_user.id, 'Неверный ввод даты. Попробуйте еще раз\n'
-                                                   'Правильный формат: dd.mm.yyyy или dd-mm-yyyy\n')
-    except ValueError:
-        bot.send_message(message.from_user.id, 'Неверный ввод даты. Попробуйте еще раз\n'
-                                               'Правильный формат: dd.mm.yyyy или dd-mm-yyyy\n')
-
-@bot.message_handler(state=[HotelInfoState.date_chack_out])
-def get_check_out_date(message: Message) -> None:
-
-    """
-    :get_min_price: обработчик ожидает сообщение
-                  с датой выселения.
-                  Проверяется корректность ввода даты, с помощью методов класса Date
-                  Если дата была введена не корректно, блок сценария повторяется.
-                  После чего предлагается ввести новое сообщение и вызывается
-                  обработчик для выполнения следующего блока сценария
-
-    :param message: объект pyTelegramBotApi
-    :return: None
-    """
-
-    try:
-        date = Date.from_string(message.text)
-        if Date.is_date_valid(date.day, date.month, date.year):
-            with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-
-                check_out_dict = dict()
-                check_out_dict["day"] = date.day
-                check_out_dict["month"] = date.month
-                check_out_dict["year"] = date.year
-                data['check_out_date'] = check_out_dict
-            bot.send_message(message.from_user.id, 'Спасибо записал. Теперь введи количество взрослых')
-            bot.set_state(message.from_user.id, HotelInfoState.adults, message.chat.id)
-        else:
-            bot.send_message(message.from_user.id, 'Неверный ввод даты. Попробуйте еще раз\n'
-                                                   'Правильный формат: dd.mm.yyyy или dd-mm-yyyy\n')
-    except ValueError:
-        bot.send_message(message.from_user.id, 'Неверный ввод даты. Попробуйте еще раз\n'
-                                               'Правильный формат: dd.mm.yyyy или dd-mm-yyyy\n')
+@bot.callback_query_handler(func=DetailedTelegramCalendar.func(calendar_id=2))
+def cal1(c):
+    result, key, step = DetailedTelegramCalendar(calendar_id=2, locale='ru').process(c.data)
+    if not result and key:
+        bot.edit_message_text(f"Введите дату выселения {LSTEP[step]}",
+                              c.message.chat.id,
+                              c.message.message_id,
+                              reply_markup=key)
+    elif result:
+        bot.edit_message_text(f"{result}",
+                              c.message.chat.id,
+                              c.message.message_id)
+        if result.day:
+            with bot.retrieve_data(c.from_user.id, c.message.chat.id) as data:
+                data['check_out_date']["day"] = result.day
+        if result.month:
+            with bot.retrieve_data(c.from_user.id, c.message.chat.id) as data:
+                data['check_out_date']["month"] = result.month
+        if result.year:
+            with bot.retrieve_data(c.from_user.id, c.message.chat.id) as data:
+                data['check_out_date']["year"] = result.year
 
 @bot.message_handler(state=[HotelInfoState.adults])
 def get_adults(message: Message) -> None:
@@ -265,9 +254,10 @@ def get_children(message: Message) -> None:
                                             data['country'], data['city'],
                                             data['adults'][0]["adults"],
                                             data['min_price'], data['max_price'],
-                                            data['check_in_date']['day'], data['check_in_date']['month'], data['check_in_date']['year'],
-                                            data['check_out_date']['day'], data['check_out_date']['month'], data['check_out_date']['year']
-                )
+                                            data['check_in_date']['day'], data['check_in_date']['month'],
+                                            data['check_in_date']['year'],
+                                            data['check_out_date']['day'], data['check_out_date']['month'],
+                                            data['check_out_date']['year'])
 
                 data['msg'] = msg
                 bot.send_message(message.chat.id, f'Сколько отелей вывести в результате?\nМаксимум 10')
@@ -305,8 +295,10 @@ def get_children_age_list(message: Message):
                                                 data['country'], data['city'],
                                                 data['adults'][0]["adults"], data['children_count'],
                                                 data['min_price'], data['max_price'],
-                                                data['check_in_date']['day'], data['check_in_date']['month'], data['check_in_date']['year'],
-                                                data['check_out_date']['day'], data['check_out_date']['month'], data['check_out_date']['year'])
+                                                data['check_in_date']['day'], data['check_in_date']['month'],
+                                                data['check_in_date']['year'],
+                                                data['check_out_date']['day'], data['check_out_date']['month'],
+                                                data['check_out_date']['year'])
             data['msg'] = msg
             bot.send_message(message.chat.id, f'Сколько отелей вывести в результате?\nМаксимум 10')
             bot.set_state(message.from_user.id, HotelInfoState.hotels_count, message.chat.id)
@@ -364,15 +356,13 @@ def get_photos_count(message: Message) -> None:
     if message.text.isdigit():
         bot.send_message(message.from_user.id, 'Спасибо записал. Формирую список отелей...')
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
-            if 0 < int(message.text) <= 10:
+            if 0 <= int(message.text) <= 10:
                 data['photos_count'] = int(message.text)
             else:
                 data['photos_count'] = 10
         get_hotels_list(message)
     else:
         bot.send_message(message.from_user.id, 'Количество может быть только числом, попробуйте ввести еще раз')
-
-
 
 def get_hotels_list(message: Message) -> None:
 
@@ -392,8 +382,6 @@ def get_hotels_list(message: Message) -> None:
 
     :return: None
     """
-
-
     try:
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data:
             create_json_with_hotels_propertys = HotelsID.set_propertys()
@@ -409,7 +397,6 @@ def get_hotels_list(message: Message) -> None:
             hotels_list = hotels_list()
 
             print('ID города {}. название {}'.format(data['city_id'][0], data['city_id'][1]))
-        bot.send_message(message.from_user.id, f'Список найденных отелей:\n')
         bot_message = ''
         country_code = data['city_id'][2]
         retrieved = Flag.select().where(Flag.country_name == country_code).get()

@@ -8,7 +8,7 @@ class Date:
         year (int): год
     return: None
     """
-    def __init__(self, day: int = 0, month: int = 0, year: int = 0) -> None:
+    def __init__(self, year: int = 0, month: int = 0, day: int = 0) -> None:
         self.day = day
         self.month = month
         self.year = year
@@ -19,7 +19,7 @@ class Date:
         )
 
     @classmethod
-    def is_date_valid(cls, day, month, year) -> bool:
+    def is_date_valid(cls, year, month, day) -> bool:
         """
         Метод для проверки правильности написания даты
         attributes:
@@ -39,11 +39,11 @@ class Date:
         return: объект класса Date
         """
         try:
-            day, month, year = map(int, date.split('.'))
+            year, month, day = map(int, date.split('.'))
         except ValueError:
-            day, month, year = map(int, date.split('-'))
+            year, month, day = map(int, date.split('-'))
 
-        date_obj = cls(day, month, year)
+        date_obj = cls(year, month, day)
         return date_obj
 
 
