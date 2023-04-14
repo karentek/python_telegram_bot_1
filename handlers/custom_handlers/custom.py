@@ -14,6 +14,7 @@ from loguru import logger
 
 db_write = crud.create()
 
+
 class MyStyleCalendar(DetailedTelegramCalendar):
     prev_button = "⬅️"
     next_button = "➡️"
@@ -21,20 +22,24 @@ class MyStyleCalendar(DetailedTelegramCalendar):
     empty_year_button = ""
     empty_day_button = ""
 
+
 @bot.message_handler(commands=["custom"])
 def choose_hotel(message: Message) -> None:
 
     """
-    Сценарий обработчиков сообщений запускается командой custom
-    в данном блоке пользователю предлагается ввести название страны для последующей обработки в
-    следующем шаге сценария
+    Сценарий обработчиков сообщений запускается
+    командой custom в данном блоке пользователю
+    предлагается ввести название страны для
+    последующей обработки в следующем шаге сценария
 
     :param message: объект pyTelegramBotApi
     :return: None
     """
+
     logger.info("Успешный запуск custom")
     bot.set_state(message.from_user.id, HotelInfoState.country, message.chat.id)
     bot.send_message(message.from_user.id, f'{message.from_user.username}, введи страну для поиска отеля')
+
 
 @bot.message_handler(state=[HotelInfoState.country])
 def get_country_(message: Message) -> None:

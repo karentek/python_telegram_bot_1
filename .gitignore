@@ -141,7 +141,7 @@ dmypy.json
 /utils/files/file.txt
 /utils/files/hotels_by_city.json
 /utils/files/hotels_list.json
-/utils/files/unicodes.db
 /handlers/custom_handlers/test_flags.py
 /handlers/custom_handlers/tester_handler.py
 /states/test_states.py
+/utils/files/unicodes.db
