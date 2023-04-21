@@ -96,11 +96,10 @@ def get_hotels_list_h(message: Message) -> None:
 
     :param
         message: объект pyTelegramBotApi
-        msg (str): необходим для записи в поле БД в одну строку
 
     :return: None
     """
-
+    bot.send_message(message.from_user.id, 'Ищу отель...')
     logger.info("Отправляются собранные данные для выполнения запроса API")
     try:
         with bot.retrieve_data(message.from_user.id, message.chat.id) as data_h:

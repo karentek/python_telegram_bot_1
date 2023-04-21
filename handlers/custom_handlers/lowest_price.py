@@ -58,6 +58,8 @@ def get_city_h(message: Message) -> None:
     :param message:
     :return:
     """
+    bot.send_message(message.from_user.id, 'Ищу отель...')
+
     logger.info("Введено название города")
     if message.text.isalpha():
         try:

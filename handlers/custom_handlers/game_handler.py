@@ -28,7 +28,8 @@ def random_flag_func(message: Message) -> None:
     random_index = random.randint(1, 258)
     random_flag = Flag.select().where(Flag.id == random_index - 1).get()
     bot.send_message(message.from_user.id, f'{random_flag.iso_code}')
-    bot.send_message(message.from_user.id, 'Какой стране принадлежит этот флаг?')
+    bot.send_message(message.from_user.id, 'Какой стране принадлежит этот флаг?\n'
+                                           'Для остановки введите "стоп"')
     bot.set_state(message.from_user.id, Game.check_country, message.chat.id)
     with bot.retrieve_data(message.from_user.id, message.chat.id) as game_data:
         logger.info("Записываем данные в game_data")

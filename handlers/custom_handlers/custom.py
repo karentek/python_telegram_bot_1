@@ -102,7 +102,6 @@ def get_city_(message: Message) -> None:
                                                    'Попробуйте заново\n'
                                                    'Введите страну поиска')
             bot.set_state(message.from_user.id, HotelInfoState.country, message.chat.id)
-
     else:
         bot.send_message(message.from_user.id, 'Можно вводить только буквы, повтори еще раз')
 
@@ -276,11 +275,9 @@ def get_children(message: Message) -> None:
                                             data['check_in_date']['year'],
                                             data['check_out_date']['day'], data['check_out_date']['month'],
                                             data['check_out_date']['year'])
-
                 data['msg'] = msg
                 bot.send_message(message.chat.id, f'Сколько отелей вывести в результате?\nМаксимум 10')
                 bot.set_state(message.from_user.id, HotelInfoState.hotels_count, message.chat.id)
-
     else:
         bot.send_message(message.from_user.id, 'Количество может быть только числом, введите еще раз')
 
