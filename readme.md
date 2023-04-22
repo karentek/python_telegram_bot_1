@@ -1,6 +1,14 @@
 # Python Diploma Basic
 
+![Logo](logo.png)
+
+
 A simple Telegram bot for travelers that helps users find a hotel to their liking, and for entertainment has a game on board to memorize the flags of all countries in the world.
+
+## Technologies used
+
+- Python
+- SQLite
 
 ## Getting started
 
