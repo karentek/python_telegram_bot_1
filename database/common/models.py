@@ -32,29 +32,30 @@ class History(ModelBase):
     user_name = pw.TextField()
     user_request = pw.TextField()
     bot_response = pw.TextField()
+    id = pw.IdentityField
 
 
 class Flag(pw.Model):
     unicode = pw.CharField()
     iso_code = pw.CharField()
     country_name = pw.CharField()
+    russian_name = pw.CharField()
 
     class Meta:
         database = db_unicodes
 
-
-if not Flag.table_exists():
-    logger.info("Создаем базу данных с флагами")
-
-    Flag.create_table()
-    tables = pd.read_html('https://unicode.bootstrap-4.ru/emoji/flags/')
-    tables[1].drop(('№'), axis=1, inplace=True)
-    tables[1].drop(('Картинка'), axis=1, inplace=True)
-    tables[1].drop(axis=0, index=[0], inplace=True)
-    for index, row in tables[1].iterrows():
-        unicode = row['Юникод']
-        iso_code = row['Символ']
-        country_name = row['Описание'].replace('flag: ', '')
-        flag = Flag(unicode=unicode, iso_code=iso_code, country_name=country_name)
-        flag.save()
+# if not Flag.table_exists():
+#     logger.info("Создаем базу данных с флагами")
+#
+#     Flag.create_table()
+#     tables = pd.read_html('https://unicode.bootstrap-4.ru/emoji/flags/')
+#     tables[1].drop(('№'), axis=1, inplace=True)
+#     tables[1].drop(('Картинка'), axis=1, inplace=True)
+#     tables[1].drop(axis=0, index=[0], inplace=True)
+#     for index, row in tables[1].iterrows():
+#         unicode = row['Юникод']
+#         iso_code = row['Символ']
+#         country_name = row['Описание'].replace('flag: ', '')
+#         flag = Flag(unicode=unicode, iso_code=iso_code, country_name=country_name)
+#         flag.save()
 

@@ -142,6 +142,5 @@ dmypy.json
 /utils/files/hotels_by_city.json
 /utils/files/hotels_list.json
 /handlers/custom_handlers/test_flags.py
-/handlers/custom_handlers/tester_handler.py
 /states/test_states.py
-/utils/files/unicodes.db
+/ololo.py
